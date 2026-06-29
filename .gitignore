@@ -1,0 +1,38 @@
+# ===== Segredos — NUNCA versionar =====
+credentials.yaml
+*.credentials
+.env
+
+# ===== Estado de runtime do QwenPaw =====
+agent.json
+skill.json
+*.skill.json.lock
+.skill.json.lock
+chats.json
+jobs.json
+copaw_file_metadata.json
+memory_file_metadata.json
+.bootstrap_completed
+
+# ===== Diretórios efêmeros / gerados =====
+sessions/
+mem_session/
+mem_metadata/
+memory/
+digest/
+media/
+resource/
+embedding_cache/
+
+# ===== Python / build =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+node_modules/
+dist/
+build/
+
+# ===== OS =====
+.DS_Store

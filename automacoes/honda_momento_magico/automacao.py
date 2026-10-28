@@ -20,13 +20,16 @@ NAO_CONFIRMADO = "NAO_CONFIRMADO"
 ERRO = "ERRO"
 
 # Palavras usadas para interpretar a mensagem final da avaliação
-TERMOS_REPROVADO = ["reprovado", "não atingiu", "nao atingiu", "insuficiente"]
+TERMOS_REPROVADO = [
+    "reprovado", "não atingiu", "nao atingiu", "insuficiente",
+    "não foi aprovado", "nao foi aprovado", "não aprovado", "nao aprovado",
+]
 TERMOS_APROVADO = ["aprovado", "parabéns", "parabens", "concluído", "concluido"]
 
 
 def classificar_resultado(texto):
     """Interpreta o texto da mensagem final. Reprovação é checada primeiro
-    porque 'reprovado' também contém 'aprovado'."""
+    porque 'reprovado' e 'não foi aprovado' também contêm 'aprovado'."""
     texto = texto.lower()
     if any(t in texto for t in TERMOS_REPROVADO):
         return REPROVADO

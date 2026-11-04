@@ -173,6 +173,7 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary)}
 .savebar .btn.primary{background:var(--bg);color:var(--text);border-color:var(--bg)}
 .toast{position:fixed;top:16px;right:16px;background:var(--ok);color:#fff;padding:10px 14px;border-radius:10px;font-weight:500;opacity:0;transform:translateY(-8px);transition:.25s;z-index:20;pointer-events:none}
 .toast.show{opacity:1;transform:none}
+.toast.err{background:var(--bad)}
 
 @media (max-width:1100px){
   .kpis{grid-template-columns:repeat(2,1fr)}
@@ -407,7 +408,7 @@ function renderRows(){
     const share=fatA(s)?fatV(s)/fatA(s):0, open=state.open.has(s.id);
     return `<div class="row seller ${open?'open':''}" id="r-${s.id}" data-row="${s.id}" role="row" aria-expanded="${open}">
       <div onclick="event.stopPropagation()"><input type="checkbox" data-sel="${s.id}" ${state.sel.has(s.id)?'checked':''} aria-label="Selecionar ${esc(s.name)}"></div>
-      <div class="who"><span class="avatar">${initials(s.name)}</span><span style="min-width:0"><b>${esc(s.name)}</b><span class="tags"><span class="tag ${s.canal.toLowerCase()}">${s.canal}</span>${dirty(s)?'<span class="tag" style="color:var(--warn);border-color:currentColor">não salvo</span>':''}</span></span></div>
+      <div class="who"><span class="avatar">${initials(s.name)}</span><span style="min-width:0"><b>${esc(s.name)}</b><span class="tags"><span class="tag ${s.canal.toLowerCase()}">${s.canal}</span><span class="tag dirtytag" style="color:var(--warn);border-color:currentColor" ${dirty(s)?'':'hidden'}>não salvo</span></span></span></div>
       <div class="c-areas tags">${s.areas.map(a=>`<span class="tag">${a}</span>`).join('')}</div>
       <div class="r c-fat num">${brl.format(fatV(s))}</div>
       <div class="c-share share"><span class="small num">${pct(share)} de ${brl.format(fatA(s))}</span><span class="mini"><i style="width:${Math.min(100,share*100)}%"></i></span></div>
@@ -458,14 +459,25 @@ document.addEventListener('change',e=>{
   if(t.dataset.sel){t.checked?state.sel.add(t.dataset.sel):state.sel.delete(t.dataset.sel);renderRows()}
   if(t.dataset.prospec){state.prospec[t.dataset.prospec]=Math.max(0,parseInt(t.value)||0);persist()}
 });
+// Atualiza só as células afetadas, sem recriar a linha: preserva foco e cliques em andamento.
+function patchRow(id,except){
+  const s=SELLERS.find(x=>x.id===id), row=document.getElementById('r-'+id); if(!row) return;
+  row.querySelector('.c-hom').textContent=brl.format(hom(s));
+  row.querySelector('.c-dev').innerHTML=devPill(s);
+  row.querySelector('.dirtytag').hidden=!dirty(s);
+  document.querySelectorAll(`input.num[data-id="${id}"]`).forEach(inp=>{
+    const v=state.draft[id][inp.dataset.st];
+    if(inp!==except) inp.value=num.format(v);
+    inp.closest('.money').classList.toggle('changed',Math.abs(v-state.saved[id][inp.dataset.st])>0.004);
+  });
+}
 document.addEventListener('focusout',e=>{
   const t=e.target; if(!t.matches?.('input.num[data-id]')) return;
   state.draft[t.dataset.id][t.dataset.st]=parse(t.value);
-  const rel=e.relatedTarget; render(); // re-render and restore focus to the next field
-  if(rel?.dataset?.id){document.querySelector(`input[data-id="${rel.dataset.id}"][data-st="${rel.dataset.st}"]`)?.focus()}
+  patchRow(t.dataset.id); soft();
 });
 document.addEventListener('input',e=>{
-  const t=e.target; if(t.matches('input.num[data-id]')){state.draft[t.dataset.id][t.dataset.st]=parse(t.value);soft()}
+  const t=e.target; if(t.matches('input.num[data-id]')){state.draft[t.dataset.id][t.dataset.st]=parse(t.value);patchRow(t.dataset.id,t);soft()}
 });
 $('#all').addEventListener('change',e=>{visible().forEach(s=>e.target.checked?state.sel.add(s.id):state.sel.delete(s.id));renderRows()});
 $('#q').addEventListener('input',e=>{state.q=e.target.value;renderRows()});
@@ -477,9 +489,14 @@ $('#apply').addEventListener('click',()=>{
   render(); toast(`Ajuste aplicado a ${ids.length} vendedor(es). Revise e salve.`);
 });
 $('#discard').addEventListener('click',()=>{SELLERS.forEach(s=>state.draft[s.id]={...state.saved[s.id]});render()});
-$('#save').addEventListener('click',()=>{const n=SELLERS.filter(dirty).length;SELLERS.forEach(s=>state.saved[s.id]={...state.draft[s.id]});persist();render();toast(`Metas de ${n} vendedor(es) salvas.`)});
-function persist(){try{localStorage.setItem(KEY,JSON.stringify({h:state.saved,p:state.prospec}))}catch(e){}}
-let tt;function toast(m){const el=$('#toast');el.textContent=m;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2600)}
+$('#save').addEventListener('click',()=>{
+  const n=SELLERS.filter(dirty).length, next={};
+  SELLERS.forEach(s=>next[s.id]={...state.draft[s.id]});
+  if(!persist(next)){toast('Não foi possível salvar. Suas alterações continuam pendentes.',true);return}
+  state.saved=next; render(); toast(`Metas de ${n} vendedor(es) salvas.`);
+});
+function persist(h=state.saved){try{localStorage.setItem(KEY,JSON.stringify({h,p:state.prospec}));return true}catch(e){return false}}
+let tt;function toast(m,err){const el=$('#toast');el.textContent=m;el.classList.toggle('err',!!err);el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2600)}
 window.addEventListener('beforeunload',e=>{if(SELLERS.some(dirty)){e.preventDefault();e.returnValue=''}});
 $('#theme').addEventListener('click',()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'});
 document.querySelectorAll('.seller').forEach(r=>r.tabIndex=0);

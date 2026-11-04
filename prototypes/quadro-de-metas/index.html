@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quadro de Metas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#fff; --surface-2:#f9fafb; --border:#e5e7eb; --border-strong:#d1d5db;
+  --text:#111827; --text-2:#4b5563; --text-3:#6b7280;
+  --primary:#1e3a8a; --primary-soft:#e0e7ff; --primary-text:#fff;
+  --brand:#d92d20;
+  --ok:#047857; --ok-soft:#d1fae5; --warn:#b45309; --warn-soft:#fef3c7; --bad:#b91c1c; --bad-soft:#fee2e2;
+  --info:#1d4ed8; --info-soft:#dbeafe;
+  --c-vde:#7c3aed; --c-vdi:#0e7490; --c-rep:#c2410c;
+  --bar-meta:#e5e7eb; --bar-sug:#93c5fd; --bar-hom:#1e3a8a;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b0f17; --surface:#121826; --surface-2:#0f1521; --border:#232c3d; --border-strong:#334155;
+  --text:#e5e7eb; --text-2:#a3aec2; --text-3:#7d889c;
+  --primary:#6d8cff; --primary-soft:#1e2a4d; --primary-text:#0b0f17;
+  --ok:#34d399; --ok-soft:#0f2e25; --warn:#fbbf24; --warn-soft:#33270b; --bad:#f87171; --bad-soft:#3a1414;
+  --info:#60a5fa; --info-soft:#132a4a;
+  --c-vde:#a78bfa; --c-vdi:#22d3ee; --c-rep:#fb923c;
+  --bar-meta:#232c3d; --bar-sug:#2f5aa8; --bar-hom:#6d8cff;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}}
+:root[data-theme="dark"]{
+  --bg:#0b0f17; --surface:#121826; --surface-2:#0f1521; --border:#232c3d; --border-strong:#334155;
+  --text:#e5e7eb; --text-2:#a3aec2; --text-3:#7d889c;
+  --primary:#6d8cff; --primary-soft:#1e2a4d; --primary-text:#0b0f17;
+  --ok:#34d399; --ok-soft:#0f2e25; --warn:#fbbf24; --warn-soft:#33270b; --bad:#f87171; --bad-soft:#3a1414;
+  --info:#60a5fa; --info-soft:#132a4a;
+  --c-vde:#a78bfa; --c-vdi:#22d3ee; --c-rep:#fb923c;
+  --bar-meta:#232c3d; --bar-sug:#2f5aa8; --bar-hom:#6d8cff;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 120px}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);font-weight:600}
+h1{margin:2px 0 0;font-size:26px;letter-spacing:-.02em}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:7px;color:var(--text-2);font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--primary);color:var(--primary-text)}
+.field{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 10px;color:var(--text-2)}
+.field input,.field select{border:0;background:none;outline:none;color:var(--text)}
+.iconbtn{border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:7px 10px;color:var(--text-2)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.kpi{padding:16px}
+.kpi .lbl{font-size:12px;color:var(--text-3);font-weight:500;display:flex;gap:6px;align-items:center}
+.kpi .val{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-top:4px}
+.kpi .sub{font-size:12px;color:var(--text-2);margin-top:2px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.progress{padding:16px;margin-top:12px}
+.progress-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-2);margin-bottom:8px}
+.legend{display:flex;gap:14px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.bar{position:relative;height:14px;border-radius:7px;background:var(--bar-meta);overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:7px;transition:width .35s ease}
+.bar .sug{background:var(--bar-sug)} .bar .hom{background:var(--bar-hom)}
+.stores{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.store{padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:center}
+.store h3{margin:0;font-size:14px}
+.store .meta{font-size:12px;color:var(--text-3)}
+.store .bar{grid-column:1/-1;height:8px;margin-top:8px}
+.store .r{text-align:right}
+
+/* Alerts */
+.section-title{display:flex;align-items:baseline;justify-content:space-between;margin:28px 0 10px;gap:12px;flex-wrap:wrap}
+.section-title h2{font-size:16px;margin:0}
+.section-title p{margin:0;color:var(--text-3);font-size:13px}
+.alerts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.alert{display:flex;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);text-align:left;width:100%}
+.alert:hover{border-color:var(--border-strong)}
+.alert .ic{flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-weight:700;font-size:13px}
+.alert b{display:block;font-size:13px}
+.alert span{font-size:12px;color:var(--text-2)}
+.t-bad .ic{background:var(--bad-soft);color:var(--bad)}
+.t-warn .ic{background:var(--warn-soft);color:var(--warn)}
+.t-info .ic{background:var(--info-soft);color:var(--info)}
+
+/* Toolbar */
+.toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0;background:var(--bg)}
+.toolbar .grow{flex:1}
+.chip{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:13px;color:var(--text-2);display:inline-flex;gap:6px;align-items:center}
+.chip[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);color:var(--primary);font-weight:600}
+.chip .n{font-size:11px;opacity:.75}
+.btn{border:1px solid var(--border-strong);background:var(--surface);border-radius:9px;padding:7px 12px;font-weight:500;font-size:13px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--primary-text)}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed}
+.batch{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px 3px 3px 10px;font-size:13px;color:var(--text-2)}
+.batch select{border:0;background:var(--surface-2);border-radius:7px;padding:4px 6px}
+
+/* Table */
+.table{overflow:hidden}
+.row{display:grid;grid-template-columns:28px minmax(150px,1.4fr) minmax(80px,.8fr) 1fr minmax(110px,1fr) 1fr 1.05fr 1.05fr 1fr 78px 24px;gap:10px;align-items:center;padding:12px 14px;border-top:1px solid var(--border)}
+.row.head{border-top:0;background:var(--surface-2);font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;padding:10px 14px}
+.row.head .r{text-align:right}
+.row .r{text-align:right}
+.seller{cursor:pointer}
+.seller:hover{background:var(--surface-2)}
+.seller.open{background:var(--surface-2)}
+.who{display:flex;gap:10px;align-items:center;min-width:0}
+.avatar{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:12px;background:var(--primary-soft);color:var(--primary)}
+.who b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;border:1px solid var(--border);color:var(--text-2)}
+.tag.vde{color:var(--c-vde);border-color:currentColor} .tag.vdi{color:var(--c-vdi);border-color:currentColor} .tag.rep{color:var(--c-rep);border-color:currentColor}
+.small{font-size:12px;color:var(--text-3)}
+.share{display:flex;flex-direction:column;gap:4px}
+.mini{height:5px;border-radius:3px;background:var(--bar-meta);overflow:hidden}
+.mini i{display:block;height:100%;background:var(--bar-sug)}
+.money{display:flex;align-items:center;justify-content:flex-end;gap:4px;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:5px 7px}
+.money:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.money.changed{border-color:var(--warn)}
+.money small{color:var(--text-3);font-size:10px;white-space:nowrap}
+.row .stl{display:none}
+.money input{border:0;outline:none;background:none;width:100%;text-align:right;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-warn{background:var(--warn-soft);color:var(--warn)} .p-bad{background:var(--bad-soft);color:var(--bad)} .p-mute{background:var(--surface-2);color:var(--text-3);border:1px solid var(--border)}
+.chev{border:0;background:none;color:var(--text-3);transition:transform .2s;padding:4px}
+.open .chev{transform:rotate(180deg)}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary)}
+.mlabel{display:none}
+.empty{padding:32px;text-align:center;color:var(--text-3)}
+
+/* Detail */
+.detail{border-top:1px dashed var(--border);background:var(--surface-2);padding:16px 14px 20px 60px}
+.detail[hidden]{display:none}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.flow{padding:14px}
+.flow h4{margin:0 0 10px;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.steps{display:grid;gap:6px}
+.step{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 10px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border)}
+.step .k{font-size:12px;color:var(--text-2)}
+.step .v{font-weight:600;text-align:right}
+.step .x{grid-column:1/-1;font-size:11px;color:var(--text-3)}
+.op{font-size:11px;color:var(--text-3);text-align:center;font-weight:600}
+.step.final{background:var(--primary-soft);border-color:transparent}
+.step.final .k,.step.final .v{color:var(--primary)}
+.detail-foot{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:12px;color:var(--text-2);align-items:center}
+.detail-foot input{width:70px;border:1px solid var(--border);border-radius:7px;padding:4px 6px;background:var(--surface)}
+.help{margin-top:28px;padding:0}
+.help summary{padding:14px 16px;cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+.help summary::-webkit-details-marker{display:none}
+.help .body{padding:0 16px 16px;color:var(--text-2);font-size:13px}
+.help ol{margin:6px 0 0;padding-left:18px}
+.help li{margin:4px 0}
+
+/* Save bar */
+.savebar{position:fixed;left:50%;bottom:16px;transform:translate(-50%,140%);visibility:hidden;transition:transform .25s ease,visibility .25s;z-index:10;display:flex;gap:12px;align-items:center;background:var(--text);color:var(--bg);padding:10px 10px 10px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
+.savebar.show{transform:translate(-50%,0);visibility:visible}
+@media (max-width:720px){.savebar{width:calc(100% - 32px);font-size:13px;gap:8px}.savebar #savemsg{flex:1}}
+.savebar .btn{background:transparent;color:var(--bg);border-color:rgba(255,255,255,.3)}
+.savebar .btn.primary{background:var(--bg);color:var(--text);border-color:var(--bg)}
+.toast{position:fixed;top:16px;right:16px;background:var(--ok);color:#fff;padding:10px 14px;border-radius:10px;font-weight:500;opacity:0;transform:translateY(-8px);transition:.25s;z-index:20;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+.toast.err{background:var(--bad)}
+
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .row{grid-template-columns:28px 1fr 1fr 1fr 1fr 78px 24px}
+  .row .c-areas,.row .c-fat,.row .c-share{display:none}
+  .row .c-hom{display:none}
+}
+@media (max-width:720px){
+  .kpis,.stores,.detail-grid{grid-template-columns:1fr}
+  .row.head{display:none}
+  .row{grid-template-columns:28px 1fr auto 24px;row-gap:8px}
+  .row .c-sug,.row .c-in{grid-column:2/-1}
+  .row .c-dev{grid-column:3;grid-row:1}
+  .row .chev{grid-column:4;grid-row:1}
+  .row .stl{display:inline}
+  .mlabel{display:inline;font-size:11px;color:var(--text-3);margin-right:auto}
+  .row .c-sug{display:flex;justify-content:space-between}
+  .detail{padding:14px}
+  .toolbar{position:static}
+  h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Cockpit Comercial</div>
+      <h1>Quadro de Metas</h1>
+    </div>
+    <div class="controls">
+      <label class="field">Mês <input type="month" id="month" value="2026-11" aria-label="Mês avaliado"></label>
+      <div class="seg" role="group" aria-label="Regional">
+        <button aria-pressed="true">BA</button><button aria-pressed="false" disabled title="Sem dados neste protótipo">PE</button><button aria-pressed="false" disabled title="Sem dados neste protótipo">PB</button>
+      </div>
+      <button class="iconbtn" id="theme" aria-label="Alternar tema claro/escuro">◐</button>
+    </div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Resumo da regional"></section>
+  <section class="card progress" aria-label="Cobertura da meta">
+    <div class="progress-head">
+      <strong>Quanto da meta das lojas já foi distribuído para vendedores</strong>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--bar-hom)"></i>Homologado</span>
+        <span><i class="dot" style="background:var(--bar-sug)"></i>Sugerido</span>
+        <span><i class="dot" style="background:var(--bar-meta);border:1px solid var(--border-strong)"></i>Meta das lojas</span>
+      </div>
+    </div>
+    <div class="bar" id="mainbar"><i class="sug"></i><i class="hom"></i></div>
+  </section>
+  <section class="stores" id="stores" aria-label="Lojas"></section>
+
+  <div class="section-title"><h2>O que precisa da sua atenção</h2><p>Clique para ir ao vendedor</p></div>
+  <section class="alerts" id="alerts"></section>
+
+  <div class="section-title"><h2>Metas por vendedor</h2><p id="count"></p></div>
+  <div class="toolbar" role="toolbar" aria-label="Filtros e ações">
+    <label class="field"><span aria-hidden="true">⌕</span><input id="q" placeholder="Buscar vendedor ou área" aria-label="Buscar"></label>
+    <div id="channels" class="controls"></div>
+    <label class="field">Área <select id="area" aria-label="Filtrar por área"></select></label>
+    <span class="grow"></span>
+    <span class="batch">Ajuste em lote
+      <select id="pct" aria-label="Percentual sobre a sugestão">
+        <option value="-10">−10%</option><option value="-5">−5%</option><option value="0" selected>0% (sugerido)</option><option value="5">+5%</option><option value="10">+10%</option><option value="20">+20%</option>
+      </select>
+      <button class="btn" id="apply"></button>
+    </span>
+  </div>
+
+  <section class="card table" aria-label="Tabela de vendedores">
+    <div class="row head" role="row">
+      <div><input type="checkbox" id="all" aria-label="Selecionar todos visíveis"></div>
+      <div>Vendedor</div><div class="c-areas">Áreas</div>
+      <div class="r c-fat">Fat. médio</div><div class="c-share">Participação na área</div>
+      <div class="r c-sug">Meta sugerida</div>
+      <div class="r c-in">Meta ABA</div><div class="r c-in">Meta JUA</div>
+      <div class="r c-hom">Homologada</div><div class="r">vs sugerida</div><div></div>
+    </div>
+    <div id="rows"></div>
+  </section>
+
+  <details class="card help">
+    <summary>Como a meta sugerida é calculada <span aria-hidden="true">＋</span></summary>
+    <div class="body">
+      Para cada loja, a meta desce em cascata com base no faturamento médio:
+      <ol>
+        <li><b>Meta da loja</b>: definida para a unidade (ex.: ABA R$ 221.631,28).</li>
+        <li><b>× peso da área na loja</b>: quanto a área do vendedor representa no faturamento da loja. O resultado é a <b>meta da área</b>.</li>
+        <li><b>× participação do vendedor na área</b>: quanto do faturamento da área vem do vendedor. O resultado é a <b>meta sugerida</b>.</li>
+        <li>Você confirma ou ajusta o valor por loja. A soma é a <b>meta homologada</b>.</li>
+      </ol>
+      A parte da meta das lojas que não chega a nenhum vendedor vem de faturamento sem vendedor atribuído (áreas sem dono, vendas avulsas).
+    </div>
+  </details>
+</div>
+
+<div class="savebar" id="savebar" role="status" aria-live="polite">
+  <span id="savemsg"></span>
+  <button class="btn" id="discard">Descartar</button>
+  <button class="btn primary" id="save">Salvar equipe</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const STORES=[
+  {id:'ABA',name:'Unidade ABA',tag:'Base loja',fat:55175.49,meta:221631.28},
+  {id:'JUA',name:'Unidade JUA',tag:'Base loja',fat:585832.95,meta:861107.30}
+];
+// a = área (fat, meta) por loja; v = vendedor (fat, meta sugerida) por loja; h = homologado
+const SELLERS=[
+ {id:'denilson',name:'Denilson Oliveira',canal:'VDE',areas:['BA03'],
+  a:{ABA:[2809.81,11286.57],JUA:[96289.34,141534.30]},v:{ABA:[1807.73,7261.37],JUA:[71804.53,105544.43]},h:{ABA:7261.37,JUA:5544.43},
+  prospec:1,semFerias:{ABA:4529.43,JUA:131454.18}},
+ {id:'ana',name:'Ana Carla',canal:'VDI',areas:['BA01','BA03','BA04','BA05'],
+  a:{ABA:[32178.93,129257.71],JUA:[424064.81,623326.67]},v:{ABA:[5734.28,23033.70],JUA:[93023.67,136734.13]},h:{ABA:23033.70,JUA:136734.13}},
+ {id:'edinei',name:'Edinei Braga',canal:'VDE',areas:['BA01'],
+  a:{ABA:[16402.82,65887.55],JUA:[188806.66,277524.15]},v:{ABA:[11142.84,44759.04],JUA:[144557.69,212483.24]},h:{ABA:44759.04,JUA:212483.24}},
+ {id:'gutierrez',name:'Gutierrez',canal:'REP',areas:['BA02'],
+  a:{ABA:[4650.33,18679.65],JUA:[1527.39,2245.09]},v:{ABA:[4593.36,18450.81],JUA:[500.75,736.05]},h:{ABA:18450.81,JUA:736.05}},
+ {id:'jaedson',name:'Jaedson',canal:'VDE',areas:['BA06'],
+  a:{ABA:[3598.37,14454.09],JUA:[118276.45,173852.83]},v:{ABA:[0,0],JUA:[0,0]},h:{ABA:0,JUA:0}},
+ {id:'jorge',name:'Jorge',canal:'REP',areas:['BA04'],
+  a:{ABA:[12960.33,52083.59],JUA:[138968.81,204268.22]},v:{ABA:[11697.71,46987.86],JUA:[55867.79,82119.25]},h:{ABA:46987.86,JUA:82119.25}},
+ {id:'murillo',name:'Murillo Thagore',canal:'VDE',areas:['BA08'],
+  a:{ABA:[14747.86,59239.84],JUA:[37943.46,55772.54]},v:{ABA:[14493.63,58218.64],JUA:[36450.16,53577.56]},h:{ABA:58218.64,JUA:53577.56}},
+ {id:'tailane',name:'Tailane',canal:'VDI',areas:['BA02','BA06','BA07','BA08'],
+  a:{ABA:[22996.56,92373.58],JUA:[161768.14,237780.63]},v:{ABA:[254.23,1021.20],JUA:[60753.24,89300.30]},h:{ABA:1021.20,JUA:89300.30}},
+];
+const KEY='quadro-metas:2026-11:BA';
+const brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+const num=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=v=>(isFinite(v)?v*100:0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+const compact=v=>'R$ '+(v>=1e6?(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:2})+' mi':(v/1e3).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil');
+const parse=s=>{const n=parseFloat(String(s).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.'));return isFinite(n)&&n>=0?n:0};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const totalFat=STORES.reduce((s,x)=>s+x.fat,0), totalMeta=STORES.reduce((s,x)=>s+x.meta,0);
+
+let saved={}; try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const state={ draft:{}, saved:{}, prospec:{}, open:new Set(), sel:new Set(), q:'', canal:'Todos', area:'Todas' };
+SELLERS.forEach(s=>{
+  const base=saved.h?.[s.id]||s.h;
+  state.saved[s.id]={...base}; state.draft[s.id]={...base};
+  state.prospec[s.id]=saved.p?.[s.id]??s.prospec??0;
+});
+
+const sug=s=>s.v.ABA[1]+s.v.JUA[1];
+const hom=(s,src='draft')=>state[src][s.id].ABA+state[src][s.id].JUA;
+const fatV=s=>s.v.ABA[0]+s.v.JUA[0], fatA=s=>s.a.ABA[0]+s.a.JUA[0];
+const dirty=s=>STORES.some(st=>Math.abs(state.draft[s.id][st.id]-state.saved[s.id][st.id])>0.004);
+function dev(s){const g=sug(s),h=hom(s); if(g===0) return h===0?{k:'none'}:{k:'manual'}; return {k:'pct',v:(h-g)/g}}
+function devPill(s){
+  const d=dev(s);
+  if(d.k==='none') return '<span class="pill p-bad" title="Sem faturamento no período: defina manualmente">Sem base</span>';
+  if(d.k==='manual') return '<span class="pill p-mute">Manual</span>';
+  const v=d.v, a=Math.abs(v), sign=v>0?'+':v<0?'−':'';
+  const cls=a<0.005?'p-ok':a<=0.10?'p-warn':'p-bad';
+  return `<span class="pill ${cls}" title="Homologada vs sugerida">${a<0.005?'✓ Igual':sign+pct(a)}</span>`;
+}
+const initials=n=>n.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();
+
+function visible(){
+  const q=state.q.trim().toLowerCase();
+  return SELLERS.filter(s=>(state.canal==='Todos'||s.canal===state.canal)
+    &&(state.area==='Todas'||s.areas.includes(state.area))
+    &&(!q||s.name.toLowerCase().includes(q)||s.areas.some(a=>a.toLowerCase().includes(q))));
+}
+
+function renderSummary(){
+  const S=SELLERS.reduce((t,s)=>t+sug(s),0), H=SELLERS.reduce((t,s)=>t+hom(s),0);
+  const semDono=totalMeta-S;
+  $('#kpis').innerHTML=`
+   <div class="card kpi"><div class="lbl">Meta das lojas</div><div class="val num">${brl.format(totalMeta)}</div><div class="sub">Fat. médio ${brl.format(totalFat)}</div></div>
+   <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--bar-sug)"></i>Sugerido para vendedores</div><div class="val num">${brl.format(S)}</div><div class="sub">${pct(S/totalMeta)} da meta · ${compact(semDono)} sem vendedor</div></div>
+   <div class="card kpi"><div class="lbl"><i class="dot" style="background:var(--bar-hom)"></i>Homologado</div><div class="val num">${brl.format(H)}</div><div class="sub">${pct(H/totalMeta)} da meta das lojas</div></div>
+   <div class="card kpi"><div class="lbl">Diferença vs sugerido</div><div class="val num" style="color:${Math.abs(H-S)<1?'var(--ok)':'var(--bad)'}">${H-S<0?'−':H-S>0?'+':''}${brl.format(Math.abs(H-S))}</div><div class="sub">${SELLERS.filter(s=>{const d=dev(s);return d.k==='pct'&&Math.abs(d.v)>=0.005}).length} vendedor(es) fora da sugestão</div></div>`;
+  $('#mainbar .sug').style.width=Math.min(100,S/totalMeta*100)+'%';
+  $('#mainbar .hom').style.width=Math.min(100,H/totalMeta*100)+'%';
+  $('#stores').innerHTML=STORES.map(st=>{
+    const h=SELLERS.reduce((t,s)=>t+state.draft[s.id][st.id],0), g=SELLERS.reduce((t,s)=>t+s.v[st.id][1],0);
+    return `<div class="card store">
+      <div><h3>${st.name} <span class="small">· ${st.tag}</span></h3><div class="meta">Fat. médio ${brl.format(st.fat)} · ${pct(st.fat/totalFat)} da regional</div></div>
+      <div class="r"><div class="num" style="font-weight:700">${brl.format(st.meta)}</div><div class="meta">meta da loja</div></div>
+      <div class="bar" title="Homologado ${brl.format(h)} · Sugerido ${brl.format(g)}"><i class="sug" style="width:${Math.min(100,g/st.meta*100)}%"></i><i class="hom" style="width:${Math.min(100,h/st.meta*100)}%"></i></div>
+      <div class="meta num">Homologado ${brl.format(h)} (${pct(h/st.meta)})</div><div class="meta r num">Sugerido ${pct(g/st.meta)}</div>
+    </div>`}).join('');
+}
+
+function renderAlerts(){
+  const out=[];
+  SELLERS.forEach(s=>{
+    const d=dev(s);
+    if(d.k==='none') out.push({t:'bad',id:s.id,ic:'!',title:`${s.name} está sem meta`,txt:'Sem faturamento no período, então não há sugestão. Defina a meta manualmente.'});
+    STORES.forEach(st=>{const g=s.v[st.id][1],h=state.draft[s.id][st.id]; if(g>0&&Math.abs(h-g)/g>0.10) out.push({t:'warn',id:s.id,ic:'↕',title:`${s.name}: ${st.id} ${h<g?'abaixo':'acima'} da sugestão`,txt:`Homologado ${brl.format(h)} vs sugerido ${brl.format(g)} (${h<g?'−':'+'}${pct(Math.abs(h-g)/g)}).`})});
+    STORES.forEach(st=>{const [vf]=s.v[st.id],[af]=s.a[st.id]; if(vf>0&&af>0&&vf/af<0.05) out.push({t:'info',id:s.id,ic:'i',title:`${s.name} tem pouca participação em ${st.id}`,txt:`Responde por só ${pct(vf/af)} do faturamento das suas áreas nessa loja.`})});
+  });
+  $('#alerts').innerHTML=out.length?out.map(a=>`<button class="alert t-${a.t}" data-go="${a.id}"><span class="ic">${a.ic}</span><span><b>${esc(a.title)}</b><span>${esc(a.txt)}</span></span></button>`).join(''):'<div class="small">Tudo certo por aqui.</div>';
+}
+
+function moneyInput(s,st){
+  const v=state.draft[s.id][st];
+  return `<label class="money ${Math.abs(v-state.saved[s.id][st])>0.004?'changed':''}" onclick="event.stopPropagation()"><small><span class="stl">${st} </span>R$</small><input class="num" inputmode="decimal" data-id="${s.id}" data-st="${st}" value="${num.format(v)}" aria-label="Meta ${st} de ${esc(s.name)}"></label>`;
+}
+
+function detail(s){
+  const flows=STORES.map(st=>{
+    const [af,am]=s.a[st.id],[vf,vm]=s.v[st.id];
+    const pa=af/st.fat, pv=af?vf/af:0;
+    return `<div class="card flow"><h4><span>${st.name}</span><span class="small">Fat. vendedor ${brl.format(vf)}</span></h4><div class="steps">
+      <div class="step"><span class="k">Meta da loja</span><span class="v num">${brl.format(st.meta)}</span></div>
+      <div class="op">× ${pct(pa)} &nbsp;peso da área na loja</div>
+      <div class="step"><span class="k">Meta da área (${s.areas.join(', ')})</span><span class="v num">${brl.format(am)}</span><span class="x">Fat. da área ${brl.format(af)} de ${brl.format(st.fat)}</span></div>
+      <div class="op">× ${pct(pv)} &nbsp;participação do vendedor na área</div>
+      <div class="step final"><span class="k">Meta sugerida</span><span class="v num">${brl.format(vm)}</span></div>
+      <div class="op">Sua decisão</div>
+      <div class="step"><span class="k">Meta homologada</span><span>${moneyInput(s,st.id)}</span>
+      ${s.semFerias?`<span class="x">Média do vendedor sem férias: ${brl.format(s.semFerias[st.id])}</span>`:''}</div>
+    </div></div>`}).join('');
+  return `<div class="detail-grid">${flows}</div>
+   <div class="detail-foot">
+     <span>Participação total nas áreas: <b class="num">${pct(fatV(s)/fatA(s))}</b> · na regional: <b class="num">${pct(fatV(s)/totalFat)}</b></span>
+     <label>Meta de prospecção (novos clientes) <input type="number" min="0" data-prospec="${s.id}" value="${state.prospec[s.id]}"></label>
+     <button class="btn" data-reset="${s.id}">Usar sugestão</button>
+   </div>`;
+}
+
+function renderRows(){
+  const list=visible();
+  $('#count').textContent=`${list.length} de ${SELLERS.length} vendedores`;
+  $('#rows').innerHTML=list.length?list.map(s=>{
+    const share=fatA(s)?fatV(s)/fatA(s):0, open=state.open.has(s.id);
+    return `<div class="row seller ${open?'open':''}" id="r-${s.id}" data-row="${s.id}" role="row" aria-expanded="${open}">
+      <div onclick="event.stopPropagation()"><input type="checkbox" data-sel="${s.id}" ${state.sel.has(s.id)?'checked':''} aria-label="Selecionar ${esc(s.name)}"></div>
+      <div class="who"><span class="avatar">${initials(s.name)}</span><span style="min-width:0"><b>${esc(s.name)}</b><span class="tags"><span class="tag ${s.canal.toLowerCase()}">${s.canal}</span><span class="tag dirtytag" style="color:var(--warn);border-color:currentColor" ${dirty(s)?'':'hidden'}>não salvo</span></span></span></div>
+      <div class="c-areas tags">${s.areas.map(a=>`<span class="tag">${a}</span>`).join('')}</div>
+      <div class="r c-fat num">${brl.format(fatV(s))}</div>
+      <div class="c-share share"><span class="small num">${pct(share)} de ${brl.format(fatA(s))}</span><span class="mini"><i style="width:${Math.min(100,share*100)}%"></i></span></div>
+      <div class="r c-sug num"><span class="mlabel">Sugerida</span>${brl.format(sug(s))}</div>
+      <div class="c-in">${moneyInput(s,'ABA')}</div>
+      <div class="c-in">${moneyInput(s,'JUA')}</div>
+      <div class="r c-hom num" style="font-weight:600">${brl.format(hom(s))}</div>
+      <div class="r c-dev">${devPill(s)}</div>
+      <button class="chev" aria-label="${open?'Recolher':'Ver cálculo'}">⌄</button>
+    </div>
+    <div class="detail" ${open?'':'hidden'}>${open?detail(s):''}</div>`}).join(''):'<div class="empty">Nenhum vendedor com esses filtros.</div>';
+  const vis=list.map(s=>s.id), all=$('#all');
+  all.checked=vis.length>0&&vis.every(id=>state.sel.has(id));
+  all.indeterminate=!all.checked&&vis.some(id=>state.sel.has(id));
+  const n=state.sel.size, p=$('#pct').value;
+  $('#apply').textContent=`Aplicar ${(+p>0?'+':'')}${p}% a ${n?n+' selecionado(s)':'todos visíveis ('+vis.length+')'}`;
+}
+
+function renderSave(){
+  const changed=SELLERS.filter(dirty);
+  const delta=changed.reduce((t,s)=>t+hom(s)-hom(s,'saved'),0);
+  $('#savebar').classList.toggle('show',changed.length>0);
+  $('#savemsg').innerHTML=`<b>${changed.length}</b> vendedor(es) alterado(s) · <span class="num">${delta<0?'−':'+'}${brl.format(Math.abs(delta))}</span>`;
+}
+function renderFilters(){
+  const counts={Todos:SELLERS.length}; SELLERS.forEach(s=>counts[s.canal]=(counts[s.canal]||0)+1);
+  $('#channels').innerHTML=['Todos','VDE','VDI','REP'].map(c=>`<button class="chip" aria-pressed="${state.canal===c}" data-canal="${c}">${c}<span class="n">${counts[c]||0}</span></button>`).join('');
+  const areas=[...new Set(SELLERS.flatMap(s=>s.areas))].sort();
+  $('#area').innerHTML=['Todas',...areas].map(a=>`<option ${a===state.area?'selected':''}>${a}</option>`).join('');
+}
+function render(){renderSummary();renderAlerts();renderRows();renderSave()}
+function soft(){renderSummary();renderAlerts();renderSave()}
+
+// events
+document.addEventListener('click',e=>{
+  const t=e.target;
+  const go=t.closest('[data-go]'); if(go){state.canal='Todos';state.area='Todas';state.q='';$('#q').value='';state.open.add(go.dataset.go);renderFilters();render();const el=$('#r-'+go.dataset.go);el.scrollIntoView({behavior:'smooth',block:'center'});el.querySelector('input.num')?.focus({preventScroll:true});return}
+  const c=t.closest('[data-canal]'); if(c){state.canal=c.dataset.canal;renderFilters();renderRows();return}
+  const r=t.closest('[data-reset]'); if(r){const s=SELLERS.find(x=>x.id===r.dataset.reset);STORES.forEach(st=>state.draft[s.id][st.id]=s.v[st.id][1]);render();return}
+  const row=t.closest('[data-row]'); if(row&&!t.closest('input,label,button:not(.chev)')){const id=row.dataset.row;state.open.has(id)?state.open.delete(id):state.open.add(id);renderRows()}
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input.num')&&e.key==='Enter'){e.target.blur()}
+  const row=e.target.closest?.('.seller'); if(row&&e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();row.click()}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.sel){t.checked?state.sel.add(t.dataset.sel):state.sel.delete(t.dataset.sel);renderRows()}
+  if(t.dataset.prospec){state.prospec[t.dataset.prospec]=Math.max(0,parseInt(t.value)||0);persist()}
+});
+// Atualiza só as células afetadas, sem recriar a linha: preserva foco e cliques em andamento.
+function patchRow(id,except){
+  const s=SELLERS.find(x=>x.id===id), row=document.getElementById('r-'+id); if(!row) return;
+  row.querySelector('.c-hom').textContent=brl.format(hom(s));
+  row.querySelector('.c-dev').innerHTML=devPill(s);
+  row.querySelector('.dirtytag').hidden=!dirty(s);
+  document.querySelectorAll(`input.num[data-id="${id}"]`).forEach(inp=>{
+    const v=state.draft[id][inp.dataset.st];
+    if(inp!==except) inp.value=num.format(v);
+    inp.closest('.money').classList.toggle('changed',Math.abs(v-state.saved[id][inp.dataset.st])>0.004);
+  });
+}
+document.addEventListener('focusout',e=>{
+  const t=e.target; if(!t.matches?.('input.num[data-id]')) return;
+  state.draft[t.dataset.id][t.dataset.st]=parse(t.value);
+  patchRow(t.dataset.id); soft();
+});
+document.addEventListener('input',e=>{
+  const t=e.target; if(t.matches('input.num[data-id]')){state.draft[t.dataset.id][t.dataset.st]=parse(t.value);patchRow(t.dataset.id,t);soft()}
+});
+$('#all').addEventListener('change',e=>{visible().forEach(s=>e.target.checked?state.sel.add(s.id):state.sel.delete(s.id));renderRows()});
+$('#q').addEventListener('input',e=>{state.q=e.target.value;renderRows()});
+$('#area').addEventListener('change',e=>{state.area=e.target.value;renderRows()});
+$('#pct').addEventListener('change',renderRows);
+$('#apply').addEventListener('click',()=>{
+  const f=1+(+$('#pct').value)/100, ids=state.sel.size?[...state.sel]:visible().map(s=>s.id);
+  ids.forEach(id=>{const s=SELLERS.find(x=>x.id===id);STORES.forEach(st=>state.draft[id][st.id]=Math.round(s.v[st.id][1]*f*100)/100)});
+  render(); toast(`Ajuste aplicado a ${ids.length} vendedor(es). Revise e salve.`);
+});
+$('#discard').addEventListener('click',()=>{SELLERS.forEach(s=>state.draft[s.id]={...state.saved[s.id]});render()});
+$('#save').addEventListener('click',()=>{
+  const n=SELLERS.filter(dirty).length, next={};
+  SELLERS.forEach(s=>next[s.id]={...state.draft[s.id]});
+  if(!persist(next)){toast('Não foi possível salvar. Suas alterações continuam pendentes.',true);return}
+  state.saved=next; render(); toast(`Metas de ${n} vendedor(es) salvas.`);
+});
+function persist(h=state.saved){try{localStorage.setItem(KEY,JSON.stringify({h,p:state.prospec}));return true}catch(e){return false}}
+let tt;function toast(m,err){const el=$('#toast');el.textContent=m;el.classList.toggle('err',!!err);el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2600)}
+window.addEventListener('beforeunload',e=>{if(SELLERS.some(dirty)){e.preventDefault();e.returnValue=''}});
+$('#theme').addEventListener('click',()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark'});
+document.querySelectorAll('.seller').forEach(r=>r.tabIndex=0);
+renderFilters();render();
+new MutationObserver(()=>document.querySelectorAll('.seller:not([tabindex])').forEach(r=>r.tabIndex=0)).observe($('#rows'),{childList:true});
+</script>
+</body>
+</html>
